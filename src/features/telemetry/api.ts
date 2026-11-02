@@ -14,8 +14,17 @@ export interface Telemetry {
   ignition: boolean | null
   odometer: number | null
   fuel: number | null
+  battery: number | null
+  battery_voltage: number | null
+  event: 'harsh_brake' | 'harsh_accel' | 'harsh_turn' | null
   received_at: string
 }
+
+export const EVENT_LABELS = {
+  harsh_brake: 'Harsh braking',
+  harsh_accel: 'Harsh acceleration',
+  harsh_turn: 'Harsh turn',
+} as const
 
 export interface TelemetryHistoryParams {
   page: number

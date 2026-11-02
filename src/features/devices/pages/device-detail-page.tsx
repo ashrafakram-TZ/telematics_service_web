@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate, useParams } from '@tanstack/react-router'
 import {
+  BatteryMedium,
   ArrowLeft,
   Compass,
   Fuel,
@@ -33,7 +34,12 @@ import {
 import { config } from '@/config/env'
 import { useNow } from '@/hooks/use-now'
 import { formatDateTime, formatNumber, timeAgo } from '@/lib/format'
-import { useLatestTelemetry, useTelemetryHistory, type Telemetry } from '@/features/telemetry/api'
+import {
+  EVENT_LABELS,
+  useLatestTelemetry,
+  useTelemetryHistory,
+  type Telemetry,
+} from '@/features/telemetry/api'
 import { useDevice } from '../api'
 import { DeleteDeviceDialog } from '../components/delete-device-dialog'
 import { DeviceFormModal } from '../components/device-form-modal'
@@ -317,6 +323,8 @@ export function DeviceDetailPage() {
                   <TableHead className='text-right'>Speed</TableHead>
                   <TableHead>Ignition</TableHead>
                   <TableHead className='hidden text-right sm:table-cell'>Fuel</TableHead>
+                  <TableHead className='hidden text-right sm:table-cell'>Battery</TableHead>
+                  <TableHead>Event</TableHead>
                   <TableHead className='hidden text-right md:table-cell'>Odometer</TableHead>
                   <TableHead className='hidden text-right lg:table-cell'>Heading</TableHead>
                 </TableRow>
@@ -338,6 +346,12 @@ export function DeviceDetailPage() {
                     </TableCell>
                     <TableCell className='tabular hidden text-right sm:table-cell'>
                       {formatNumber(row.fuel, 0, '%')}
+                    </TableCell>
+                    <TableCell className='tabular hidden text-right sm:table-cell'>
+                      {formatNumber(row.battery, 0, '%')}
+                    </TableCell>
+                    <TableCell>
+                      {row.event ? <Badge tone='danger'>{EVENT_LABELS[row.event]}</Badge> : '—'}
                     </TableCell>
                     <TableCell className='tabular hidden text-right md:table-cell'>
                       {formatNumber(row.odometer, 1, 'km')}
@@ -392,6 +406,11 @@ function ReadingTiles({ reading }: { reading: Telemetry }) {
       icon: KeyRound,
     },
     { label: 'Fuel', value: formatNumber(reading.fuel, 0, '%'), icon: Fuel },
+    {
+      label: 'Battery',
+      value: `${formatNumber(reading.battery, 0, '%')}${reading.battery_voltage ? ` · ${reading.battery_voltage.toFixed(1)} V` : ''}`,
+      icon: BatteryMedium,
+    },
     { label: 'Heading', value: formatNumber(reading.heading, 0, '°'), icon: Compass },
   ]
 
